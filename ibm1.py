@@ -1,5 +1,6 @@
 import numpy as np
 from copy import deepcopy
+import json
 
 c_e_dict = {}
 c_e_f_dict = {}
@@ -61,23 +62,11 @@ def get_c_e_f(e_j, f_i):
 
     num_times = 0
 
-    try:
+    if e_j in c_e_f_dict:
+        if f_i in c_e_f_dict[e_j]:
+            num_times = c_e_f_dict[e_j][f_i]
 
-        if e_j in c_e_f_dict:
-            if f_i in c_e_f_dict[e_j]:
-                num_times = c_e_f_dict[e_j][f_i]
-
-        return num_times
-
-    except Exception as e:
-        print("e-s")
-        print(e_j)
-        print(f_i)
-        print(e)
-        print(c_e_f_dict[e_j])
-        print("e-e")
-
-        return num_times
+    return num_times
 
 
 def get_c_e(e_j):
@@ -137,11 +126,7 @@ def set_t_f_e():
 
     for e_j in t_f_e_dict:
         for f_i in t_f_e_dict[e_j]:
-            print("-s-")
-            print(get_c_e_f(e_j, f_i))
-            print(get_c_e(e_j))
             t_f_e_dict[e_j][f_i] = get_c_e_f(e_j, f_i) / get_c_e(e_j)
-            print("-e-")
 
 
 def kroneckers_delta(sentence_pair, i, j):
@@ -206,6 +191,14 @@ def create_t_f_e_dict(base_dict):
     t_f_e_dict = base_dict
 
 
+def save_t_f_e():
+    global t_f_e_dict
+
+    with open('t_f_e.json', 'w') as f:
+        json.dump(t_f_e_dict, f)
+        f.close()
+
+
 def main():
     data = load_data(num_examples=1000)
     create_global_dicts(data)
@@ -243,6 +236,8 @@ def main():
                     set_c_e(e[j], new_c_e)
 
         set_t_f_e()
+
+    save_t_f_e()
 
 
 main()

@@ -4,8 +4,10 @@ import json
 
 c_e_dict = {}
 c_e_f_dict = {}
+
 c_j_i_l_m_dict = {}
 c_i_l_m_dict = {}
+q_j_i_l_m_dict = {}
 
 t_f_e_dict = {}
 
@@ -57,41 +59,6 @@ def format_line(line):
     return line.strip().split(" ")
 
 
-def get_c_e_f(e_j, f_i):
-    global c_e_f_dict
-
-    num_times = 0
-
-    try:
-
-        if e_j in c_e_f_dict:
-            if f_i in c_e_f_dict[e_j]:
-                num_times = c_e_f_dict[e_j][f_i]
-
-        return num_times
-
-    except Exception as e:
-        print("e-s")
-        print(e_j)
-        print(f_i)
-        print(e)
-        print(c_e_f_dict[e_j])
-        print("e-e")
-
-        return num_times
-
-
-def get_c_e(e_j):
-    global c_e_dict
-
-    num_times = 0
-
-    if e_j in c_e_dict:
-        num_times = c_e_dict[e_j]
-
-    return num_times
-
-
 def reset_c_e_dict():
     global c_e_dict
 
@@ -110,7 +77,11 @@ def reset_c_e_f_dict():
 def reset_c_j_i_l_m_dict():
     global c_j_i_l_m_dict
 
-    return
+    for l in c_j_i_l_m_dict:
+        for m in c_j_i_l_m_dict[l]:
+            for j in c_j_i_l_m_dict[l][m]:
+                for i in c_j_i_l_m_dict[l][m][j]:
+                    c_j_i_l_m_dict[l][m][j][i] = 0
 
 
 def reset_c_i_l_m_dict():
@@ -121,12 +92,35 @@ def reset_c_i_l_m_dict():
             c_i_l_m_dict[l][m] = 0
 
 
+def get_c_e_f(e_j, f_i):
+    global c_e_f_dict
+
+    num_times = 0
+
+    if e_j in c_e_f_dict:
+        if f_i in c_e_f_dict[e_j]:
+            num_times = c_e_f_dict[e_j][f_i]
+
+    return num_times
+
+
 def set_c_e_f(e_j, f_i, val):
     global c_e_f_dict
 
     if e_j in c_e_f_dict:
         if f_i in c_e_f_dict[e_j]:
             c_e_f_dict[e_j][f_i] = val
+
+
+def get_c_e(e_j):
+    global c_e_dict
+
+    num_times = 0
+
+    if e_j in c_e_dict:
+        num_times = c_e_dict[e_j]
+
+    return num_times
 
 
 def set_c_e(e_j, val):
@@ -154,6 +148,30 @@ def set_c_i_l_m(l, m, val):
         c_i_l_m_dict[l][m] = val
 
 
+def get_c_j_i_l_m(l, m, j, i):
+    global c_j_i_l_m_dict
+
+    num_times = 0
+
+    if l in c_j_i_l_m_dict:
+        if m in c_j_i_l_m_dict[l]:
+            if j in c_j_i_l_m_dict[l][m]:
+                if i in c_j_i_l_m_dict[l][m][j]:
+                    num_times = c_j_i_l_m_dict[l][m][j][i]
+
+    return num_times
+
+
+def set_c_j_i_l_m(l, m, j, i, val):
+    global c_j_i_l_m_dict
+
+    if l in c_j_i_l_m_dict:
+        if m in c_j_i_l_m_dict[l]:
+            if j in c_j_i_l_m_dict[l][m]:
+                if i in c_j_i_l_m_dict[l][m][j]:
+                    c_j_i_l_m_dict[l][m][j][i] = val
+
+
 def get_t_f_e(e_j, f_i):
     global t_f_e_dict
 
@@ -170,45 +188,83 @@ def set_t_f_e():
 
     for e_j in t_f_e_dict:
         for f_i in t_f_e_dict[e_j]:
-            print("-s-")
-            print(get_c_e_f(e_j, f_i))
-            print(get_c_e(e_j))
             t_f_e_dict[e_j][f_i] = get_c_e_f(e_j, f_i) / get_c_e(e_j)
-            print("-e-")
 
 
-def kroneckers_delta(sentence_pair, i, j):
+def get_q_j_i_l_m(l, m, j, i):
+    global q_j_i_l_m_dict
+
+    num_times = 0
+
+    if l in q_j_i_l_m_dict and m in q_j_i_l_m_dict[l] and j in q_j_i_l_m_dict[l][m] and i in q_j_i_l_m_dict[l][m][j]:
+        num_times = q_j_i_l_m_dict[l][m][j][i]
+
+    return num_times
+
+
+def set_q_j_i_l_m():
+    global q_j_i_l_m_dict
+
+    for l in q_j_i_l_m_dict:
+        for m in q_j_i_l_m_dict[l]:
+            for j in q_j_i_l_m_dict[l][m]:
+                for i in q_j_i_l_m_dict[l][m][j]:
+                    numerator = get_c_j_i_l_m(l, m, j, i)
+                    denominator = get_c_i_l_m(l, m)
+
+                    q_j_i_l_m_dict[l][m][j][i] = numerator / denominator
+
+
+def kroneckers_delta(sentence_pair, j, i):
 
     e = sentence_pair[0]
     f = sentence_pair[1]
 
-    # numerator =
+    l = len(e)
+    m = len(f)
 
-    numerator_t_f_e = get_t_f_e(e[j], f[i])
-    denominator_t_f_e = sum([get_t_f_e(e_j, f[i]) for e_j in e])
+    numerator = get_q_j_i_l_m(l, m, j, i) * get_t_f_e(e[j], f[i])
+    denominator = sum([get_q_j_i_l_m(l, m, k, i) *
+                       get_t_f_e(e[k], f[i]) for k in range(l)])
 
-    return numerator_t_f_e / denominator_t_f_e
+    return numerator / denominator
 
 
 def create_global_dicts(data):
     global c_i_l_m_dict
     global c_j_i_l_m_dict
+    global q_j_i_l_m_dict
 
+    q_j_i_l_m_dict_initial_val = 1/230
     base_dict = {}
 
     for pair in data:
         e = pair[0]
         f = pair[1]
 
-        # c_i_l_m dict
+        # c_i_l_m, c_j_i_l_m, and q_j_i_l_m dict
         len_e = len(e)
         len_f = len(f)
 
         if len_e not in c_i_l_m_dict:
             c_i_l_m_dict[len_e] = {}
+            c_j_i_l_m_dict[len_e] = {}
+            q_j_i_l_m_dict[len_e] = {}
 
         if len_f not in c_i_l_m_dict[len_e]:
             c_i_l_m_dict[len_e][len_f] = 0
+            c_j_i_l_m_dict[len_e][len_f] = {}
+            q_j_i_l_m_dict[len_e][len_f] = {}
+
+        for l in range(len_e):
+            if l not in q_j_i_l_m_dict[len_e][len_f]:
+                c_j_i_l_m_dict[len_e][len_f][l] = {}
+                q_j_i_l_m_dict[len_e][len_f][l] = {}
+
+            for m in range(len_f):
+                if m not in q_j_i_l_m_dict[len_e][len_f][l]:
+                    c_j_i_l_m_dict[len_e][len_f][l][m] = 0
+                    q_j_i_l_m_dict[len_e][len_f][l][m] = q_j_i_l_m_dict_initial_val
 
         # base dict for use in c_e/c_e_f
         for e_j in e:
@@ -264,7 +320,7 @@ def main():
         # reset counters
         reset_c_e_dict()
         reset_c_e_f_dict()
-        # reset_c_j_i_l_m_dict()
+        reset_c_j_i_l_m_dict()
         reset_c_i_l_m_dict()
 
         # iterate over sentence pairs
@@ -281,7 +337,7 @@ def main():
                 # for word e_j in the english sentence
                 for j in range(l):
                     # kroneckers delta
-                    k_delta = kroneckers_delta(pair, i, j)
+                    k_delta = kroneckers_delta(pair, j, i)
 
                     # update c_e_f dict
                     new_c_e_f = get_c_e_f(e[j], f[i]) + k_delta
@@ -292,14 +348,15 @@ def main():
                     set_c_e(e[j], new_c_e)
 
                     # update c_j_i_l_m dict
-                    '''new_c_e = get_c_e(e[j]) + kroneckers_delta(pair, i, j)
-                    set_c_e(e[j], new_c_e)'''
+                    new_c_j_i_l_m = get_c_j_i_l_m(l, m, j, i) + k_delta
+                    set_c_j_i_l_m(l, m, j, i, new_c_j_i_l_m)
 
                     # update c_i_l_m dict
                     new_c_i_l_m = get_c_i_l_m(l, m) + k_delta
                     set_c_i_l_m(l, m, new_c_i_l_m)
 
         set_t_f_e()
+        set_q_j_i_l_m()
 
 
 main()
